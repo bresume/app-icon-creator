@@ -58,15 +58,15 @@ if not os.path.exists(out_path):
 
 im = Image.open(icon)
 
-images = {}
+images = []
 
 for size in SIZES:
     out = im.resize(size)
     new_name = f"{out_path}/{base_name}_{size}.{ext}"
     out.save(new_name)
-    images[out]=new_name
+    images.append(new_name)
 
 with ZipFile(f"{out_path}/{base_name}.zip",'w') as zip:
-    for key,value in images.items():
+    for value in images:
         zip.write(value)
 
