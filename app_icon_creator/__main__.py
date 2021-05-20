@@ -1,4 +1,4 @@
-import argparse,os
+import argparse,os,shutil
 from PIL import Image
 from zipfile import ZipFile
 
@@ -8,7 +8,7 @@ parser.add_argument("--base_icon",default = "",help ="The icon to resize.")
 parser.add_argument("--output_path",default = "./output",help = "The path to drop the new icons.")
 parser.add_argument("--icon_name",default = "",help = "Optional name to use to rename the generated icons. If empty we will use the name of the base icon + the new size.")
 parser.add_argument("--extension",default = ".png",help = "The file extension to use.")
-parser.add_argument("--cleanup",default = False,help = "If true, the program will clean all generated images outside of the zip file.")
+parser.add_argument("--cleanup",default = "n",help = "If true, the program will clean all generated images outside of the zip file.")
 
 #Image sizes.
 SIZES = [
@@ -50,6 +50,7 @@ SIZES = [
 
 #Set vars.
 args = vars(parser.parse_args())
+print(f"Begin app_icon_creator. \n    Args = {args}")
 icon = args["base_icon"]
 out_path = args["output_path"]
 base_name = args["icon_name"]
@@ -61,26 +62,48 @@ if base_name == "":
 
 ext = args["extension"]
 
+cleanup = args["cleanup"].lower()
+
+cleanup = True if cleanup == "y" or cleanup == "yes" or cleanup == "true" else False
+
 if not os.path.exists(out_path):
     os.makedirs(out_path)
+    print("Path does not exist. Creating path...")
 
 im = Image.open(icon)
 
 images = []
 
 #Resize images.
+print("Begin resize.")
 for size in SIZES:
     out = im.resize(size)
-    new_name = f"{out_path}/{base_name}_{size}.{ext}"
-    out.save(new_name)
-    images.append(new_name)
+    name = f"{base_name}_{size}.{ext}"
+    print(f"New image at: {name}")
+    out.save(name)
+    images.append(name)
+
+zipname = f"{base_name}.zip"
+print(f"Zipfile = {zipname}")
 
 #Zip everything up.
-with ZipFile(f"{out_path}/{base_name}.zip",'w') as zip:
+with ZipFile(zipname,'w') as zip:
     for value in images:
         zip.write(value)
+        print(f"Zipped:{value}")
+
+#Move the zipfile to the directory.
+new_zipname = f"{out_path}/{zipname}"
+
+shutil.move(zipname,new_zipname)
+
+print(f"Move {zipname} to {new_zipname}")
 
 #Remove the loose images if cleanup option is true.
-if args["cleanup"]:
+if cleanup:
     for fil in images:
         os.remove(fil)
+        print(f"Removed: {fil}")
+else:
+    for fil in images:
+        shutil.move(fil,f"{out_path}/{fil}")
