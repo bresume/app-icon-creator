@@ -14,7 +14,8 @@
 
     --output_path, default = ./output, help = The directory to drop your icons.
     --icon_name,default = "",help = Optional name to use to rename the generated icons. If empty we will use the name of the base icon + the new size.
-    --extension,default = ".png",help = The file extension to use.
+    --extension,default = .png,help = The file extension to use.
+    --cleanup,default = False,help = If true, the program will clean all generated images outside of the zip file.
 
 ## Requirements
     PIL (pip install pillow)

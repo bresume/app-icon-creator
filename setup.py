@@ -6,7 +6,7 @@ from constants import __version__
 setup(
   name = 'app_icon_creator',
   packages = find_packages(),
-  version = __version__,
+  version = 1,
   license='MIT',
   description = 'A simple app icon creator',
   author = 'Behron Georgantas',
